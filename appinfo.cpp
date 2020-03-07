@@ -1,16 +1,10 @@
 #include "appinfo.h"
 
-#include <QDateTime>
-#include <QDir>
-#include <QDebug>
-#include "consts.h"
-
 AppInfo::AppInfo(QObject *parent) : QObject(parent)
 {
     process = new QProcess();
-    connect(process, SIGNAL(started()), this, SLOT(stateOn()));
-    connect(process , SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(stateOff(int)));
+    connect(process, SIGNAL(started()), this, SLOT(started()));
+    connect(process , SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(stopped(int)));
 }
 
 AppInfo::~AppInfo()
@@ -29,32 +23,30 @@ QString AppInfo::printableName()
 
 bool AppInfo::isOn()
 {
-    return state == AppState::ON;
+    return AppState::ON == state;
 }
 
-void AppInfo::stateOn()
+void AppInfo::started()
 {
     state = AppState::ON;
     exitCode = -1;
     emit stateChanged();
 }
 
-void AppInfo::stateOff(int code)
+void AppInfo::stopped(int code)
 {
-    state = manual ? AppState::MANUAL_OFF : AppState::SELF_OFF;
+    state = manualOff ? AppState::MANUAL_OFF : AppState::SELF_OFF;
     exitCode = code;
-    manual = false;
+    manualOff = false;
     emit stateChanged();
 }
 
-void AppInfo::startProcess(bool withLogs=false)
+void AppInfo::startProcess()
 {
-    if (withLogs) {
+    if (saveOutput) {
         QString now = QDateTime::currentDateTime().toString(DATE_TIME_FORMAT);
         QString logDir = qApp->applicationDirPath() + LOG_PATH + "/" + name;
-        QDir dir(logDir);
-        if (!dir.exists())
-            dir.mkpath(".");
+        QDir dir = Utils::prepareDirectory(logDir);
         process->setStandardOutputFile(logDir + "/" + now + ".log");
         process->setStandardErrorFile(logDir + "/" + now + "_error.log");
     }
@@ -66,7 +58,7 @@ void AppInfo::startProcess(bool withLogs=false)
 
 void AppInfo::stopProcess()
 {
-    manual = true;
+    manualOff = true;
     process->terminate();
 }
 

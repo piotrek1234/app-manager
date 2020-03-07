@@ -6,7 +6,6 @@
 class Settings
 {
 public:
-    Settings();
     QString terminal = "";
 };
 

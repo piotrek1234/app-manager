@@ -20,15 +20,17 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settings.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    utils.cpp
 
 HEADERS += \
     appinfo.h \
+    appstate.h \
     consts.h \
     mainwindow.h \
-    offstate.h \
     settings.h \
-    settingsdialog.h
+    settingsdialog.h \
+    utils.h
 
 FORMS += \
     mainwindow.ui \

@@ -1,11 +1,15 @@
 #ifndef APPINFO_H
 #define APPINFO_H
 
+#include <QApplication>
+#include <QDateTime>
+#include <QDir>
 #include <QObject>
 #include <QProcess>
 #include <QString>
-#include <QApplication>
-#include "offstate.h"
+#include "appstate.h"
+#include "consts.h"
+#include "utils.h"
 
 class AppInfo : public QObject
 {
@@ -14,23 +18,24 @@ Q_OBJECT
 public:
     explicit AppInfo(QObject *parent = nullptr);
     ~AppInfo();
-    QProcess *process;
-    QString name = "app";
+    AppInfo* clone();
+    QString printableName();
+    bool isOn();
+    QString name = DEFAULT_APP_NAME;
     QString path;
     QString workingDir;
     bool saveOutput = false;
     AppState state = AppState::INITIAL_OFF;
-    int exitCode = -1;
-    QString printableName();
-    bool isOn();
-    bool manual = false;
 public slots:
-    void startProcess(bool withLogs);
+    void startProcess();
     void stopProcess();
-    AppInfo* clone();
 private slots:
-    void stateOn();
-    void stateOff(int code);
+    void started();
+    void stopped(int code);
+private:
+    QProcess *process;
+    int exitCode = -1;
+    bool manualOff = false;
 signals:
     void stateChanged();
 };

@@ -1,16 +1,4 @@
-#include "appinfo.h"
 #include "mainwindow.h"
-#include "settingsdialog.h"
-#include "ui_mainwindow.h"
-#include "consts.h"
-
-#include <QSettings>
-#include <QDateTime>
-#include <QDir>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QFileDialog>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,9 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     settingsPath = SETTINGS_FILE;
     loadSettings();
     QString logDir = qApp->applicationDirPath() + LOG_PATH;
-    QDir dir(logDir);
-    if (!dir.exists())
-        dir.mkpath(".");
+    Utils::prepareDirectory(logDir);
 }
 
 MainWindow::~MainWindow()
@@ -34,13 +20,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbStartApp_clicked()
 {
-    AppInfo *info = infos.at(currentApp);
-    info->startProcess(ui->cbOutput->isChecked());
+    getCurrentAppInfo()->startProcess();
 }
 
 void MainWindow::on_pbStopApp_clicked()
 {
-    infos.at(currentApp)->stopProcess();
+    getCurrentAppInfo()->stopProcess();
 }
 
 void MainWindow::on_pbAddApp_clicked()
@@ -48,7 +33,7 @@ void MainWindow::on_pbAddApp_clicked()
     AppInfo *info = new AppInfo();
     connect(info, SIGNAL(stateChanged()), this, SLOT(refreshList()));
     infos.append(info);
-    QIcon icon = statusToIcon(info->state);
+    QIcon icon = Utils::appStateToIcon(info->state);
     QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
     ui->lwApps->addItem(item);
     saveSettings();
@@ -59,30 +44,32 @@ void MainWindow::refreshList()
     int index = ui->lwApps->currentRow();
     ui->lwApps->clear();
     for(AppInfo* info : infos) {
-        QIcon icon = statusToIcon(info->state);
+        QIcon icon = Utils::appStateToIcon(info->state);
         QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
         ui->lwApps->addItem(item);
     }
     ui->lwApps->setCurrentRow(index);
 }
 
+AppInfo *MainWindow::getCurrentAppInfo()
+{
+    return infos.at(currentAppIndex);
+}
+
 void MainWindow::on_pbRemoveApp_clicked()
 {
-    AppInfo *info = infos.at(currentApp);
+    AppInfo *info = getCurrentAppInfo();
     delete info;
-    infos.remove(currentApp);
-    ui->lwApps->takeItem(currentApp);
+    infos.remove(currentAppIndex);
+    ui->lwApps->takeItem(currentAppIndex);
     saveSettings();
 }
 
 void MainWindow::on_pbSaveInfo_clicked()
 {
-    AppInfo *info = infos.at(currentApp);
-    info->name = ui->leName->text();
-    info->path = ui->pathToExe->text();
-    info->workingDir = ui->leFolder->text();
-    info->saveOutput = ui->cbOutput->isChecked();
-    ui->lwApps->item(currentApp)->setText(info->printableName());
+    AppInfo *info = getCurrentAppInfo();
+    setInfoFromUi(info);
+    ui->lwApps->item(currentAppIndex)->setText(info->printableName());
     if (ui->pathToExe->text() == "") {
         ui->pbStartApp->setEnabled(false);
         ui->pbStopApp->setEnabled(false);
@@ -92,14 +79,14 @@ void MainWindow::on_pbSaveInfo_clicked()
         ui->pbStopApp->setEnabled(info->isOn());
         ui->pbSaveInfo->setEnabled(true);
     }
-    ui->pbOpenWorkDir->setEnabled(ui->leFolder->text() != "");
+    ui->pbOpenWorkDir->setEnabled(ui->leWorkDir->text() != "");
 
     saveSettings();
 }
 
 void MainWindow::on_lwApps_currentRowChanged(int currentRow)
 {
-    currentApp = currentRow;
+    currentAppIndex = currentRow;
     if (currentRow < 0) {
         ui->leName->setEnabled(false);
         ui->pathToExe->setEnabled(false);
@@ -110,31 +97,31 @@ void MainWindow::on_lwApps_currentRowChanged(int currentRow)
         ui->pbOpenLogDir->setEnabled(false);
         ui->cbOutput->setEnabled(false);
         ui->pbBrowseExe->setEnabled(false);
-        ui->pbBrowseFolder->setEnabled(false);
+        ui->pbBrowseWorkDir->setEnabled(false);
         ui->pbStartTerminal->setEnabled(false);
         ui->pbDuplicateApp->setEnabled(false);
         ui->pbRemoveApp->setEnabled(false);
         ui->pbMoveUp->setEnabled(false);
         ui->pbMoveDown->setEnabled(false);
     } else {
-        AppInfo *info = infos.at(currentApp);
+        AppInfo *info = getCurrentAppInfo();
         ui->leName->setText(info->name);
         ui->pathToExe->setText(info->path);
-        ui->leFolder->setText(info->workingDir);
+        ui->leWorkDir->setText(info->workingDir);
         ui->cbOutput->setChecked(info->saveOutput);
         ui->leName->setEnabled(true);
         ui->pathToExe->setEnabled(true);
         ui->pbSaveInfo->setEnabled(true);
-        ui->pbOpenWorkDir->setEnabled(ui->leFolder->text() != "");
+        ui->pbOpenWorkDir->setEnabled(ui->leWorkDir->text() != "");
         ui->pbOpenLogDir->setEnabled(true);
         ui->cbOutput->setEnabled(true);
         ui->pbBrowseExe->setEnabled(true);
-        ui->pbBrowseFolder->setEnabled(true);
-        ui->pbStartTerminal->setEnabled(ui->leFolder->text() != "" && internalSettings.terminal != "");
+        ui->pbBrowseWorkDir->setEnabled(true);
+        ui->pbStartTerminal->setEnabled(ui->leWorkDir->text() != "" && internalSettings.terminal != "");
         ui->pbDuplicateApp->setEnabled(true);
         ui->pbRemoveApp->setEnabled(true);
-        ui->pbMoveUp->setEnabled(currentApp > 0);
-        ui->pbMoveDown->setEnabled(currentApp < infos.length() - 1);
+        ui->pbMoveUp->setEnabled(currentAppIndex > 0);
+        ui->pbMoveDown->setEnabled(currentAppIndex < infos.length() - 1);
 
         if (ui->pathToExe->text() == "") {
             ui->pbStartApp->setEnabled(false);
@@ -143,20 +130,6 @@ void MainWindow::on_lwApps_currentRowChanged(int currentRow)
             ui->pbStartApp->setEnabled(!info->isOn());
             ui->pbStopApp->setEnabled(info->isOn());
         }
-    }
-}
-
-QIcon MainWindow::statusToIcon(AppState state)
-{
-    switch(state) {
-        case AppState::ON:
-            return QIcon(":/status/on");
-            break;
-        case AppState::SELF_OFF:
-            return QIcon(":/status/off_warn");
-            break;
-        default:
-            return QIcon(":/status/off");
     }
 }
 
@@ -178,7 +151,7 @@ void MainWindow::loadSettings()
         info->saveOutput = settings.value(SETTINGS__SAVE_OUTPUT_PREFIX + num, false).toBool();
         connect(info, SIGNAL(stateChanged()), this, SLOT(refreshList()));
         infos.append(info);
-        QIcon icon = statusToIcon(info->state);
+        QIcon icon = Utils::appStateToIcon(info->state);
         QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
         ui->lwApps->addItem(item);
     }
@@ -201,10 +174,10 @@ void MainWindow::saveSettings()
 
 void MainWindow::on_pbMoveUp_clicked()
 {
-    if (currentApp >= 0) {
-        infos.move(currentApp, currentApp - 1);
-        currentApp--;
-        ui->lwApps->setCurrentRow(currentApp);
+    if (currentAppIndex >= 0) {
+        infos.move(currentAppIndex, currentAppIndex - 1);
+        currentAppIndex--;
+        ui->lwApps->setCurrentRow(currentAppIndex);
         refreshList();
         saveSettings();
     }
@@ -212,10 +185,10 @@ void MainWindow::on_pbMoveUp_clicked()
 
 void MainWindow::on_pbMoveDown_clicked()
 {
-    if (currentApp >= 0 && currentApp < infos.length() - 1) {
-        infos.move(currentApp, currentApp + 1);
-        currentApp++;
-        ui->lwApps->setCurrentRow(currentApp);
+    if (currentAppIndex >= 0 && currentAppIndex < infos.length() - 1) {
+        infos.move(currentAppIndex, currentAppIndex + 1);
+        currentAppIndex++;
+        ui->lwApps->setCurrentRow(currentAppIndex);
         refreshList();
         saveSettings();
     }
@@ -223,8 +196,7 @@ void MainWindow::on_pbMoveDown_clicked()
 
 void MainWindow::on_pbOpenLogDir_clicked()
 {
-    QString logDir = qApp->applicationDirPath() + LOG_PATH + "/" + infos.at(currentApp)->name;
-    qDebug() << logDir;
+    QString logDir = qApp->applicationDirPath() + LOG_PATH + "/" + getCurrentAppInfo()->name;
     QDir dir(logDir);
     if (!dir.exists())
         dir.mkpath(".");
@@ -233,7 +205,7 @@ void MainWindow::on_pbOpenLogDir_clicked()
 
 void MainWindow::on_pbOpenWorkDir_clicked()
 {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(ui->leFolder->text()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(ui->leWorkDir->text()));
 }
 
 void MainWindow::on_pbBrowseExe_clicked()
@@ -244,20 +216,19 @@ void MainWindow::on_pbBrowseExe_clicked()
     }
 }
 
-void MainWindow::on_pbBrowseFolder_clicked()
+void MainWindow::on_pbBrowseWorkDir_clicked()
 {
-    QString dir = ui->leFolder->text() == "" ? QDir::currentPath() : ui->leFolder->text();
+    QString dir = ui->leWorkDir->text() == "" ? QDir::currentPath() : ui->leWorkDir->text();
     QString directory = QFileDialog::getExistingDirectory(this, tr("Find Files"), dir);
 
     if (!directory.isEmpty()) {
-        ui->leFolder->setText(directory);
+        ui->leWorkDir->setText(directory);
     }
 }
 
 void MainWindow::on_pbStartTerminal_clicked()
 {
-    AppInfo *info = infos.at(currentApp);
-    QProcess::startDetached(internalSettings.terminal, {}, info->workingDir);
+    QProcess::startDetached(internalSettings.terminal, {}, getCurrentAppInfo()->workingDir);
 }
 
 void MainWindow::on_pbSettings_clicked()
@@ -270,18 +241,25 @@ void MainWindow::on_pbSettings_clicked()
 void MainWindow::updateSettings(Settings settings)
 {
     internalSettings.terminal = settings.terminal;
-    qDebug() << internalSettings.terminal;
     ui->pbStartTerminal->setEnabled(internalSettings.terminal != "" &&
-            currentApp > -1 && infos.at(currentApp)->workingDir != "");
+            currentAppIndex > -1 && getCurrentAppInfo()->workingDir != "");
 }
 
 void MainWindow::on_pbDuplicateApp_clicked()
 {
-    AppInfo *newInfo = infos.at(currentApp)->clone();
+    AppInfo *newInfo = getCurrentAppInfo()->clone();
     connect(newInfo, SIGNAL(stateChanged()), this, SLOT(refreshList()));
     infos.append(newInfo);
-    QIcon icon = statusToIcon(newInfo->state);
+    QIcon icon = Utils::appStateToIcon(newInfo->state);
     QListWidgetItem *item = new QListWidgetItem(icon, newInfo->printableName());
     ui->lwApps->addItem(item);
     saveSettings();
+}
+
+void MainWindow::setInfoFromUi(AppInfo *info)
+{
+    info->name = ui->leName->text();
+    info->path = ui->pathToExe->text();
+    info->workingDir = ui->leWorkDir->text();
+    info->saveOutput = ui->cbOutput->isChecked();
 }

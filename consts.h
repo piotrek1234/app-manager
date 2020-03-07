@@ -3,6 +3,7 @@
 
 #include <QString>
 
+const QString DEFAULT_APP_NAME = "app";
 
 const QString DATE_TIME_FORMAT = "yyyy-MM-dd_hh-mm-ss";
 const QString LOG_PATH = "/log";
