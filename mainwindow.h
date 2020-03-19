@@ -65,6 +65,7 @@ private slots:
     void handleTrayIconClick(QSystemTrayIcon::ActivationReason reason);
     void configureTrayIcon();
     void openLogsDir();
+    void showOrHideMainWindow();
 
 private:
     Ui::MainWindow *ui;
