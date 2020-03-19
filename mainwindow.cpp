@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <QMenu>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -9,12 +11,15 @@ MainWindow::MainWindow(QWidget *parent)
     loadSettings();
     QString logDir = qApp->applicationDirPath() + LOG_PATH;
     Utils::prepareDirectory(logDir);
+    configureTrayIcon();
 }
 
 MainWindow::~MainWindow()
 {
     QSettings settings(settingsPath, QSettings::IniFormat);
     settings.setValue(SETTINGS__WINDOW_HEIGHT, this->geometry().height());
+    delete tray->contextMenu();
+    delete tray;
     delete ui;
 }
 
@@ -243,6 +248,35 @@ void MainWindow::updateSettings(Settings settings)
     internalSettings.terminal = settings.terminal;
     ui->pbStartTerminal->setEnabled(internalSettings.terminal != "" &&
             currentAppIndex > -1 && getCurrentAppInfo()->workingDir != "");
+}
+
+void MainWindow::handleTrayIconClick(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
+        this->setVisible(!this->isVisible());
+    }
+}
+
+void MainWindow::configureTrayIcon()
+{
+    tray = new QSystemTrayIcon(QIcon(":/tray/apps"));
+    connect(tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(handleTrayIconClick(QSystemTrayIcon::ActivationReason)));
+    QMenu *trayMenu = new QMenu();
+    tray->setToolTip("AppManager");
+    trayMenu->addAction(QIcon(":/icon/stop"), "Zatrzymaj wszystko", this, SLOT(on_pbStopAll_clicked()));
+    trayMenu->addAction(QIcon(":/icon/logs"), "Folder z logami", this, SLOT(openLogsDir()));
+    tray->setContextMenu(trayMenu);
+    tray->show();
+}
+
+void MainWindow::openLogsDir()
+{
+    QString logDir = qApp->applicationDirPath() + LOG_PATH;
+    QDir dir(logDir);
+    if (!dir.exists())
+        dir.mkpath(".");
+    QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
 void MainWindow::on_pbDuplicateApp_clicked()

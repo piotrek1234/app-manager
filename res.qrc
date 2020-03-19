@@ -20,4 +20,7 @@
         <file alias="off">icons/lightbulb_off.png</file>
         <file alias="off_warn">icons/lightbulb_off_warn.png</file>
     </qresource>
+    <qresource prefix="/tray">
+        <file alias="apps">icons/application_view_tile.png</file>
+    </qresource>
 </RCC>

@@ -10,6 +10,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QUrl>
+#include <QSystemTrayIcon>
 #include "appinfo.h"
 #include "consts.h"
 #include "settings.h"
@@ -59,11 +60,17 @@ private slots:
     void on_pbSettings_clicked();
     void updateSettings(Settings setitings);
 
+    // other
+    void handleTrayIconClick(QSystemTrayIcon::ActivationReason reason);
+    void configureTrayIcon();
+    void openLogsDir();
+
 private:
     Ui::MainWindow *ui;
     QVector<AppInfo*> infos;
     int currentAppIndex = 0;
     QString settingsPath;
     Settings internalSettings;
+    QSystemTrayIcon *tray;
 };
 #endif // MAINWINDOW_H
