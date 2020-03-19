@@ -1,13 +1,10 @@
 #include "mainwindow.h"
 
-#include <QMenu>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    settingsPath = SETTINGS_FILE;
     loadSettings();
     QString logDir = qApp->applicationDirPath() + LOG_PATH;
     Utils::prepareDirectory(logDir);
@@ -16,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    QSettings settings(settingsPath, QSettings::IniFormat);
+    QSettings settings(SETTINGS_FILE, QSettings::IniFormat);
     settings.setValue(SETTINGS__WINDOW_HEIGHT, this->geometry().height());
     delete tray->contextMenu();
     delete tray;
@@ -140,7 +137,7 @@ void MainWindow::on_lwApps_currentRowChanged(int currentRow)
 
 void MainWindow::loadSettings()
 {
-    QSettings settings(settingsPath, QSettings::IniFormat);
+    QSettings settings(SETTINGS_FILE, QSettings::IniFormat);
     int count = settings.value(SETTINGS__APPS_COUNT, 0).toInt();
     int height = settings.value(SETTINGS__WINDOW_HEIGHT, 320).toInt();
     QRect size = this->geometry();
@@ -164,7 +161,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings(settingsPath, QSettings::IniFormat);
+    QSettings settings(SETTINGS_FILE, QSettings::IniFormat);
     int count = infos.length();
     settings.setValue(SETTINGS__APPS_COUNT, count);
     for(int i = 0; i < count; ++i) {
