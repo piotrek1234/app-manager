@@ -4,6 +4,7 @@
 #include <QString>
 
 const QString DEFAULT_APP_NAME = "app";
+const bool DEFAULT_SHOW_TRAY_APPS_COUNT = true;
 
 const QString DATE_TIME_FORMAT = "yyyy-MM-dd_hh-mm-ss";
 const QString LOG_PATH = "/log";
@@ -12,6 +13,7 @@ const QString SETTINGS_FILE = "settings.ini";
 const QString SETTINGS__APPS_COUNT = "count";
 const QString SETTINGS__WINDOW_HEIGHT = "windowHeight";
 const QString SETTINGS__TERMINAL = "terminal";
+const QString SETTINGS__TRAY_APPS_COUNT = "showTraysAppsCount";
 const QString SETTINGS__NAME_PREFIX = "name-";
 const QString SETTINGS__PATH_PREFIX = "path-";
 const QString SETTINGS__WORK_DIR_PREFIX = "workingDir-";

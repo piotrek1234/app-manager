@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMenu>
+#include <QPainter>
 #include <QProcess>
 #include <QSettings>
 #include <QSystemTrayIcon>
@@ -48,6 +49,7 @@ private slots:
     void on_pbStartApp_clicked();
     void on_pbStopApp_clicked();
     void on_pbStopAll_clicked();
+    int getRunningAppsCount();
 
     // app info settings
     void on_pbBrowseExe_clicked();
@@ -64,6 +66,7 @@ private slots:
     // other
     void handleTrayIconClick(QSystemTrayIcon::ActivationReason reason);
     void configureTrayIcon();
+    void updateTrayIcon(bool forceUpdate=false);
     void openLogsDir();
     void showOrHideMainWindow();
 

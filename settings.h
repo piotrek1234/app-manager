@@ -7,6 +7,7 @@ class Settings
 {
 public:
     QString terminal = "";
+    bool showAppsCount = true;
 };
 
 #endif // SETTINGS_H

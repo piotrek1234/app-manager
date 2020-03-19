@@ -51,6 +51,7 @@ void MainWindow::refreshList()
         ui->lwApps->addItem(item);
     }
     ui->lwApps->setCurrentRow(index);
+    updateTrayIcon();
 }
 
 AppInfo *MainWindow::getCurrentAppInfo()
@@ -144,6 +145,7 @@ void MainWindow::loadSettings()
     size.setHeight(height);
     this->setGeometry(size);
     internalSettings.terminal = settings.value(SETTINGS__TERMINAL, "").toString();
+    internalSettings.showAppsCount = settings.value(SETTINGS__TRAY_APPS_COUNT, DEFAULT_SHOW_TRAY_APPS_COUNT).toBool();
     for(int i = 0; i < count; ++i) {
         QString num = QString::number(i);
         AppInfo *info = new AppInfo();
@@ -243,8 +245,10 @@ void MainWindow::on_pbSettings_clicked()
 void MainWindow::updateSettings(Settings settings)
 {
     internalSettings.terminal = settings.terminal;
+    internalSettings.showAppsCount = settings.showAppsCount;
     ui->pbStartTerminal->setEnabled(internalSettings.terminal != "" &&
             currentAppIndex > -1 && getCurrentAppInfo()->workingDir != "");
+    updateTrayIcon(true);
 }
 
 void MainWindow::handleTrayIconClick(QSystemTrayIcon::ActivationReason reason)
@@ -266,6 +270,24 @@ void MainWindow::configureTrayIcon()
     trayMenu->addAction(QIcon(":/icon/logs"), "Folder z logami", this, SLOT(openLogsDir()));
     tray->setContextMenu(trayMenu);
     tray->show();
+}
+
+void MainWindow::updateTrayIcon(bool forceUpdate)
+{
+    if (forceUpdate || internalSettings.showAppsCount) {
+        int runningApps = getRunningAppsCount();
+        if (internalSettings.showAppsCount && runningApps > 0) {
+            QPixmap pixmap(":/tray/apps_bullet");
+            QPainter painter(&pixmap);
+            QFont font = QFont("Arial", 6);
+            painter.setFont(font);
+            painter.drawText(1, 15, QString::number(runningApps));
+            tray->setIcon(QIcon(pixmap));
+        } else {
+            tray->setIcon(QIcon(":/tray/apps"));
+        }
+    }
+
 }
 
 void MainWindow::openLogsDir()
@@ -308,4 +330,15 @@ void MainWindow::on_pbStopAll_clicked()
             info->stopProcess();
         }
     }
+}
+
+int MainWindow::getRunningAppsCount()
+{
+    int result = 0;
+    for (AppInfo *info : infos) {
+        if (info->isOn()) {
+            result++;
+        }
+    }
+    return result;
 }
