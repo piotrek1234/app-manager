@@ -263,3 +263,12 @@ void MainWindow::setInfoFromUi(AppInfo *info)
     info->workingDir = ui->leWorkDir->text();
     info->saveOutput = ui->cbOutput->isChecked();
 }
+
+void MainWindow::on_pbStopAll_clicked()
+{
+    for (AppInfo *info : infos) {
+        if (info->isOn()) {
+            info->stopProcess();
+        }
+    }
+}

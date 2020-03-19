@@ -45,6 +45,7 @@ private slots:
     void on_pbStartTerminal_clicked();
     void on_pbStartApp_clicked();
     void on_pbStopApp_clicked();
+    void on_pbStopAll_clicked();
 
     // app info settings
     void on_pbBrowseExe_clicked();
@@ -57,6 +58,7 @@ private slots:
     // system settings
     void on_pbSettings_clicked();
     void updateSettings(Settings setitings);
+
 private:
     Ui::MainWindow *ui;
     QVector<AppInfo*> infos;

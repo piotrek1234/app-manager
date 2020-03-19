@@ -13,6 +13,7 @@
         <file alias="logs">icons/page_white_stack.png</file>
         <file alias="wrench">icons/wrench.png</file>
         <file alias="duplicate">icons/application_double.png</file>
+        <file alias="stop">icons/control_stop.png</file>
     </qresource>
     <qresource prefix="/status">
         <file alias="on">icons/lightbulb.png</file>
