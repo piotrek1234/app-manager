@@ -50,6 +50,7 @@ private slots:
     void on_pbStopApp_clicked();
     void on_pbStopAll_clicked();
     int getRunningAppsCount();
+    void handleAppStateChanged(AppInfo* info);
 
     // app info settings
     void on_pbBrowseExe_clicked();

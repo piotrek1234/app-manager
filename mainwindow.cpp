@@ -33,7 +33,8 @@ void MainWindow::on_pbStopApp_clicked()
 void MainWindow::on_pbAddApp_clicked()
 {
     AppInfo *info = new AppInfo();
-    connect(info, SIGNAL(stateChanged()), this, SLOT(refreshList()));
+    connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(refreshList()));
+    connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
     infos.append(info);
     QIcon icon = Utils::appStateToIcon(info->state);
     QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
@@ -146,6 +147,7 @@ void MainWindow::loadSettings()
     this->setGeometry(size);
     internalSettings.terminal = settings.value(SETTINGS__TERMINAL, "").toString();
     internalSettings.showAppsCount = settings.value(SETTINGS__TRAY_APPS_COUNT, DEFAULT_SHOW_TRAY_APPS_COUNT).toBool();
+    internalSettings.notifySelfOff = settings.value(SETTINGS__NOTIFY_SELF_OFF, DEFAULT_NOTIFY_SELF_OFF).toBool();
     for(int i = 0; i < count; ++i) {
         QString num = QString::number(i);
         AppInfo *info = new AppInfo();
@@ -153,7 +155,8 @@ void MainWindow::loadSettings()
         info->path = settings.value(SETTINGS__PATH_PREFIX + num, "").toString();
         info->workingDir = settings.value(SETTINGS__WORK_DIR_PREFIX + num, "").toString();
         info->saveOutput = settings.value(SETTINGS__SAVE_OUTPUT_PREFIX + num, false).toBool();
-        connect(info, SIGNAL(stateChanged()), this, SLOT(refreshList()));
+        connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(refreshList()));
+        connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
         infos.append(info);
         QIcon icon = Utils::appStateToIcon(info->state);
         QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
@@ -246,6 +249,7 @@ void MainWindow::updateSettings(Settings settings)
 {
     internalSettings.terminal = settings.terminal;
     internalSettings.showAppsCount = settings.showAppsCount;
+    internalSettings.notifySelfOff = settings.notifySelfOff;
     ui->pbStartTerminal->setEnabled(internalSettings.terminal != "" &&
             currentAppIndex > -1 && getCurrentAppInfo()->workingDir != "");
     updateTrayIcon(true);
@@ -341,4 +345,13 @@ int MainWindow::getRunningAppsCount()
         }
     }
     return result;
+}
+
+void MainWindow::handleAppStateChanged(AppInfo *info)
+{
+    if (internalSettings.notifySelfOff && info->state == AppState::SELF_OFF) {
+
+        tray->showMessage("AppManager",
+                          "Aplikacja " + info->name + " wyłączyła się");
+    }
 }

@@ -37,7 +37,7 @@ private:
     int exitCode = -1;
     bool manualOff = false;
 signals:
-    void stateChanged();
+    void stateChanged(AppInfo* info);
 };
 
 #endif // APPINFO_H

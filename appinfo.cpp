@@ -30,7 +30,7 @@ void AppInfo::started()
 {
     state = AppState::ON;
     exitCode = -1;
-    emit stateChanged();
+    emit stateChanged(this);
 }
 
 void AppInfo::stopped(int code)
@@ -38,7 +38,7 @@ void AppInfo::stopped(int code)
     state = manualOff ? AppState::MANUAL_OFF : AppState::SELF_OFF;
     exitCode = code;
     manualOff = false;
-    emit stateChanged();
+    emit stateChanged(this);
 }
 
 void AppInfo::startProcess()

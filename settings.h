@@ -8,6 +8,7 @@ class Settings
 public:
     QString terminal = "";
     bool showAppsCount = true;
+    bool notifySelfOff = true;
 };
 
 #endif // SETTINGS_H
