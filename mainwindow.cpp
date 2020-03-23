@@ -272,6 +272,7 @@ void MainWindow::configureTrayIcon()
     trayMenu->addAction("Pokaż/ukryj", this, SLOT(showOrHideMainWindow()));
     trayMenu->addAction(QIcon(":/icon/stop"), "Zatrzymaj wszystko", this, SLOT(on_pbStopAll_clicked()));
     trayMenu->addAction(QIcon(":/icon/logs"), "Folder z logami", this, SLOT(openLogsDir()));
+    trayMenu->addAction(QIcon(":/icon/delete"), "Wyłącz", this, SLOT(beforeExit()));
     tray->setContextMenu(trayMenu);
     tray->show();
 }
@@ -291,7 +292,6 @@ void MainWindow::updateTrayIcon(bool forceUpdate)
             tray->setIcon(QIcon(":/tray/apps"));
         }
     }
-
 }
 
 void MainWindow::openLogsDir()
@@ -306,6 +306,35 @@ void MainWindow::openLogsDir()
 void MainWindow::showOrHideMainWindow()
 {
     this->setVisible(!this->isVisible());
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+    this->setVisible(false);
+}
+
+void MainWindow::beforeExit()
+{
+    int running = getRunningAppsCount();
+    if (running > 0) {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Część aplikacji jeszcze pracuje(%1). Co robimy?").arg(running));
+        QPushButton *closeAll = msgBox.addButton("Wyłącz wszystko i wyjdź", QMessageBox::YesRole);
+        QPushButton *justQuit = msgBox.addButton("Zostaw włączone i wyjdź", QMessageBox::NoRole);
+        QPushButton *stay = msgBox.addButton("Nic nie wyłączaj", QMessageBox::RejectRole);
+        msgBox.exec();
+        if (msgBox.clickedButton() == closeAll) {
+            on_pbStopAll_clicked();
+            qApp->quit();
+        } else if (msgBox.clickedButton() == justQuit) {
+            qApp->quit();
+        } else if (msgBox.clickedButton() == stay) {
+            // nothing
+        }
+    } else {
+        qApp->quit();
+    }
 }
 
 void MainWindow::on_pbDuplicateApp_clicked()

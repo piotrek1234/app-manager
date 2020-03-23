@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QDir>
@@ -8,6 +9,7 @@
 #include <QListWidget>
 #include <QMainWindow>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPainter>
 #include <QProcess>
 #include <QSettings>
@@ -70,6 +72,8 @@ private slots:
     void updateTrayIcon(bool forceUpdate=false);
     void openLogsDir();
     void showOrHideMainWindow();
+    void closeEvent(QCloseEvent *event);
+    void beforeExit();
 
 private:
     Ui::MainWindow *ui;
