@@ -84,6 +84,7 @@ void MainWindow::on_pbSaveInfo_clicked()
         ui->pbSaveInfo->setEnabled(true);
     }
     ui->pbOpenWorkDir->setEnabled(ui->leWorkDir->text() != "");
+    ui->pbStartTerminal->setEnabled(ui->leWorkDir->text() != "");
 
     saveSettings();
 }
