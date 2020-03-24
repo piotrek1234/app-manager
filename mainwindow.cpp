@@ -319,7 +319,7 @@ void MainWindow::beforeExit()
     int running = getRunningAppsCount();
     if (running > 0) {
         QMessageBox msgBox;
-        msgBox.setText(QString("Część aplikacji jeszcze pracuje(%1). Co robimy?").arg(running));
+        msgBox.setText(QString("Część aplikacji jeszcze pracuje (%1). Co robimy?").arg(running));
         QPushButton *closeAll = msgBox.addButton("Wyłącz wszystko i wyjdź", QMessageBox::YesRole);
         QPushButton *justQuit = msgBox.addButton("Zostaw włączone i wyjdź", QMessageBox::NoRole);
         QPushButton *stay = msgBox.addButton("Nic nie wyłączaj", QMessageBox::RejectRole);
