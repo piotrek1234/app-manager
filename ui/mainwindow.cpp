@@ -47,8 +47,7 @@ void MainWindow::refreshList()
 {
     int index = ui->twApps->indexOfTopLevelItem(ui->twApps->currentItem());
     ui->twApps->clear();
-    for (int i=0; i<infos.size(); i++) {
-        AppInfo *info = infos.at(i);
+    for (AppInfo *info : infos) {
         QIcon icon = Utils::appStateToIcon(info->state);
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
         item->setIcon(0, icon);
@@ -76,8 +75,7 @@ void MainWindow::on_pbSaveInfo_clicked()
 {
     AppInfo *info = getCurrentAppInfo();
     setInfoFromUi(info);
-    QTreeWidgetItem *item = ui->twApps->topLevelItem(currentAppIndex);
-    item->setText(1, info->printableName());
+    ui->twApps->topLevelItem(currentAppIndex)->setText(1, info->printableName());
     if (ui->pathToExe->text() == "") {
         ui->pbStartApp->setEnabled(false);
         ui->pbStopApp->setEnabled(false);
@@ -362,9 +360,8 @@ void MainWindow::handleAppStateChanged(AppInfo *info)
 
 void MainWindow::on_twApps_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
-    int currentRow = ui->twApps->indexOfTopLevelItem(current);
-    currentAppIndex = currentRow;
-    if (currentRow < 0) {
+    currentAppIndex = ui->twApps->indexOfTopLevelItem(current);
+    if (currentAppIndex < 0) {
         ui->leName->setEnabled(false);
         ui->pathToExe->setEnabled(false);
         ui->pbStartApp->setEnabled(false);
