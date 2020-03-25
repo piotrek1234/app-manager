@@ -40,9 +40,9 @@ private slots:
     void on_pbMoveDown_clicked();
     void on_pbMoveUp_clicked();
     void on_pbRemoveApp_clicked();
-    void on_lwApps_currentRowChanged(int currentRow);
     void refreshList();
     AppInfo* getCurrentAppInfo();
+    void on_twApps_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
     // app control
     void on_pbOpenLogDir_clicked();

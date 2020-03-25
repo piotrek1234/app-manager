@@ -382,7 +382,53 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="lwApps"/>
+       <widget class="QTreeWidget" name="twApps">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::CurrentChanged</set>
+        </property>
+        <property name="showDropIndicator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="indentation">
+         <number>0</number>
+        </property>
+        <property name="rootIsDecorated">
+         <bool>true</bool>
+        </property>
+        <property name="headerHidden">
+         <bool>true</bool>
+        </property>
+        <property name="expandsOnDoubleClick">
+         <bool>false</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>20</number>
+        </attribute>
+        <attribute name="headerDefaultSectionSize">
+         <number>83</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>state</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>info</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>branch</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </item>

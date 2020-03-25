@@ -5,6 +5,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->twApps->setColumnWidth(0, 20);
+    ui->twApps->setColumnWidth(1, 140);
     loadSettings();
     prepareLogDir();
     configureTrayIcon();
@@ -35,21 +37,24 @@ void MainWindow::on_pbAddApp_clicked()
     connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
     infos.append(info);
     QIcon icon = Utils::appStateToIcon(info->state);
-    QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
-    ui->lwApps->addItem(item);
+    QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+    item->setIcon(0, icon);
+    item->setText(1, info->printableName());
     saveSettings();
 }
 
 void MainWindow::refreshList()
 {
-    int index = ui->lwApps->currentRow();
-    ui->lwApps->clear();
-    for(AppInfo* info : infos) {
+    int index = ui->twApps->indexOfTopLevelItem(ui->twApps->currentItem());
+    ui->twApps->clear();
+    for (int i=0; i<infos.size(); i++) {
+        AppInfo *info = infos.at(i);
         QIcon icon = Utils::appStateToIcon(info->state);
-        QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
-        ui->lwApps->addItem(item);
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+        item->setIcon(0, icon);
+        item->setText(1, info->printableName());
     }
-    ui->lwApps->setCurrentRow(index);
+    ui->twApps->setCurrentItem(ui->twApps->topLevelItem(index));
     updateTrayIcon();
 }
 
@@ -63,7 +68,7 @@ void MainWindow::on_pbRemoveApp_clicked()
     AppInfo *info = getCurrentAppInfo();
     delete info;
     infos.remove(currentAppIndex);
-    ui->lwApps->takeItem(currentAppIndex);
+    ui->twApps->takeTopLevelItem(currentAppIndex);
     saveSettings();
 }
 
@@ -71,7 +76,8 @@ void MainWindow::on_pbSaveInfo_clicked()
 {
     AppInfo *info = getCurrentAppInfo();
     setInfoFromUi(info);
-    ui->lwApps->item(currentAppIndex)->setText(info->printableName());
+    QTreeWidgetItem *item = ui->twApps->topLevelItem(currentAppIndex);
+    item->setText(1, info->printableName());
     if (ui->pathToExe->text() == "") {
         ui->pbStartApp->setEnabled(false);
         ui->pbStopApp->setEnabled(false);
@@ -85,55 +91,6 @@ void MainWindow::on_pbSaveInfo_clicked()
     ui->pbStartTerminal->setEnabled(ui->leWorkDir->text() != "");
 
     saveSettings();
-}
-
-void MainWindow::on_lwApps_currentRowChanged(int currentRow)
-{
-    currentAppIndex = currentRow;
-    if (currentRow < 0) {
-        ui->leName->setEnabled(false);
-        ui->pathToExe->setEnabled(false);
-        ui->pbStartApp->setEnabled(false);
-        ui->pbStopApp->setEnabled(false);
-        ui->pbSaveInfo->setEnabled(false);
-        ui->pbOpenWorkDir->setEnabled(false);
-        ui->pbOpenLogDir->setEnabled(false);
-        ui->cbOutput->setEnabled(false);
-        ui->pbBrowseExe->setEnabled(false);
-        ui->pbBrowseWorkDir->setEnabled(false);
-        ui->pbStartTerminal->setEnabled(false);
-        ui->pbDuplicateApp->setEnabled(false);
-        ui->pbRemoveApp->setEnabled(false);
-        ui->pbMoveUp->setEnabled(false);
-        ui->pbMoveDown->setEnabled(false);
-    } else {
-        AppInfo *info = getCurrentAppInfo();
-        ui->leName->setText(info->name);
-        ui->pathToExe->setText(info->path);
-        ui->leWorkDir->setText(info->workingDir);
-        ui->cbOutput->setChecked(info->saveOutput);
-        ui->leName->setEnabled(true);
-        ui->pathToExe->setEnabled(true);
-        ui->pbSaveInfo->setEnabled(true);
-        ui->pbOpenWorkDir->setEnabled(ui->leWorkDir->text() != "");
-        ui->pbOpenLogDir->setEnabled(true);
-        ui->cbOutput->setEnabled(true);
-        ui->pbBrowseExe->setEnabled(true);
-        ui->pbBrowseWorkDir->setEnabled(true);
-        ui->pbStartTerminal->setEnabled(ui->leWorkDir->text() != "" && internalSettings.terminal != "");
-        ui->pbDuplicateApp->setEnabled(true);
-        ui->pbRemoveApp->setEnabled(true);
-        ui->pbMoveUp->setEnabled(currentAppIndex > 0);
-        ui->pbMoveDown->setEnabled(currentAppIndex < infos.length() - 1);
-
-        if (ui->pathToExe->text() == "") {
-            ui->pbStartApp->setEnabled(false);
-            ui->pbStopApp->setEnabled(false);
-        } else {
-            ui->pbStartApp->setEnabled(!info->isOn());
-            ui->pbStopApp->setEnabled(info->isOn());
-        }
-    }
 }
 
 void MainWindow::loadSettings()
@@ -157,8 +114,9 @@ void MainWindow::loadSettings()
         connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
         infos.append(info);
         QIcon icon = Utils::appStateToIcon(info->state);
-        QListWidgetItem *item = new QListWidgetItem(icon, info->printableName());
-        ui->lwApps->addItem(item);
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+        item->setIcon(0, icon);
+        item->setText(1, info->printableName());
     }
 }
 
@@ -182,7 +140,7 @@ void MainWindow::on_pbMoveUp_clicked()
     if (currentAppIndex >= 0) {
         infos.move(currentAppIndex, currentAppIndex - 1);
         currentAppIndex--;
-        ui->lwApps->setCurrentRow(currentAppIndex);
+        ui->twApps->setCurrentItem(ui->twApps->topLevelItem(currentAppIndex));
         refreshList();
         saveSettings();
     }
@@ -193,7 +151,7 @@ void MainWindow::on_pbMoveDown_clicked()
     if (currentAppIndex >= 0 && currentAppIndex < infos.length() - 1) {
         infos.move(currentAppIndex, currentAppIndex + 1);
         currentAppIndex++;
-        ui->lwApps->setCurrentRow(currentAppIndex);
+        ui->twApps->setCurrentItem(ui->twApps->topLevelItem(currentAppIndex));
         refreshList();
         saveSettings();
     }
@@ -359,8 +317,9 @@ void MainWindow::on_pbDuplicateApp_clicked()
     connect(newInfo, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
     infos.append(newInfo);
     QIcon icon = Utils::appStateToIcon(newInfo->state);
-    QListWidgetItem *item = new QListWidgetItem(icon, newInfo->printableName());
-    ui->lwApps->addItem(item);
+    QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+    item->setIcon(0, icon);
+    item->setText(1, newInfo->printableName());
     saveSettings();
 }
 
@@ -397,8 +356,56 @@ void MainWindow::handleAppStateChanged(AppInfo *info)
     refreshList();
     checkExitAfterAllClosed();
     if (internalSettings.notifySelfOff && info->state == AppState::SELF_OFF) {
+        tray->showMessage("AppManager", "Aplikacja " + info->name + " wyłączyła się");
+    }
+}
 
-        tray->showMessage("AppManager",
-                          "Aplikacja " + info->name + " wyłączyła się");
+void MainWindow::on_twApps_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    int currentRow = ui->twApps->indexOfTopLevelItem(current);
+    currentAppIndex = currentRow;
+    if (currentRow < 0) {
+        ui->leName->setEnabled(false);
+        ui->pathToExe->setEnabled(false);
+        ui->pbStartApp->setEnabled(false);
+        ui->pbStopApp->setEnabled(false);
+        ui->pbSaveInfo->setEnabled(false);
+        ui->pbOpenWorkDir->setEnabled(false);
+        ui->pbOpenLogDir->setEnabled(false);
+        ui->cbOutput->setEnabled(false);
+        ui->pbBrowseExe->setEnabled(false);
+        ui->pbBrowseWorkDir->setEnabled(false);
+        ui->pbStartTerminal->setEnabled(false);
+        ui->pbDuplicateApp->setEnabled(false);
+        ui->pbRemoveApp->setEnabled(false);
+        ui->pbMoveUp->setEnabled(false);
+        ui->pbMoveDown->setEnabled(false);
+    } else {
+        AppInfo *info = getCurrentAppInfo();
+        ui->leName->setText(info->name);
+        ui->pathToExe->setText(info->path);
+        ui->leWorkDir->setText(info->workingDir);
+        ui->cbOutput->setChecked(info->saveOutput);
+        ui->leName->setEnabled(true);
+        ui->pathToExe->setEnabled(true);
+        ui->pbSaveInfo->setEnabled(true);
+        ui->pbOpenWorkDir->setEnabled(ui->leWorkDir->text() != "");
+        ui->pbOpenLogDir->setEnabled(true);
+        ui->cbOutput->setEnabled(true);
+        ui->pbBrowseExe->setEnabled(true);
+        ui->pbBrowseWorkDir->setEnabled(true);
+        ui->pbStartTerminal->setEnabled(ui->leWorkDir->text() != "" && internalSettings.terminal != "");
+        ui->pbDuplicateApp->setEnabled(true);
+        ui->pbRemoveApp->setEnabled(true);
+        ui->pbMoveUp->setEnabled(currentAppIndex > 0);
+        ui->pbMoveDown->setEnabled(currentAppIndex < infos.length() - 1);
+
+        if (ui->pathToExe->text() == "") {
+            ui->pbStartApp->setEnabled(false);
+            ui->pbStopApp->setEnabled(false);
+        } else {
+            ui->pbStartApp->setEnabled(!info->isOn());
+            ui->pbStopApp->setEnabled(info->isOn());
+        }
     }
 }
