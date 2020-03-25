@@ -5,6 +5,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    ui->lVersion->setText(VERSION);
     loadSettings();
 }
 

@@ -81,6 +81,22 @@
     <string>Powiadomienie jeśli aplikacja się sama wyłączy</string>
    </property>
   </widget>
+  <widget class="QLabel" name="lVersion">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>v</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

@@ -3,6 +3,8 @@
 
 #include <QString>
 
+const QString VERSION = "v0.1.1";
+
 const QString DEFAULT_APP_NAME = "app";
 const bool DEFAULT_SHOW_TRAY_APPS_COUNT = true;
 const bool DEFAULT_NOTIFY_SELF_OFF = true;
