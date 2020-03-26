@@ -259,7 +259,7 @@ void MainWindow::updateSettings(Settings settings)
 void MainWindow::handleTrayIconClick(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::ActivationReason::Trigger || reason == QSystemTrayIcon::ActivationReason::DoubleClick) {
-        showOrHideMainWindow();
+        showMainWindow();
     }
 }
 
@@ -270,7 +270,7 @@ void MainWindow::configureTrayIcon()
             this, SLOT(handleTrayIconClick(QSystemTrayIcon::ActivationReason)));
     QMenu *trayMenu = new QMenu();
     tray->setToolTip("AppManager");
-    trayMenu->addAction("Pokaż/ukryj", this, SLOT(showOrHideMainWindow()));
+    trayMenu->addAction(QIcon(":/tray/apps"), "Pokaż", this, SLOT(showMainWindow()));
     trayMenu->addAction(QIcon(":/icon/stop"), "Zatrzymaj wszystko", this, SLOT(on_pbStopAll_clicked()));
     trayMenu->addAction(QIcon(":/icon/logs"), "Folder z logami", this, SLOT(openLogsDir()));
     trayMenu->addAction(QIcon(":/icon/delete"), "Wyłącz", this, SLOT(beforeExit()));
@@ -304,9 +304,9 @@ void MainWindow::openLogsDir()
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
-void MainWindow::showOrHideMainWindow()
+void MainWindow::showMainWindow()
 {
-    this->setVisible(!this->isVisible());
+    this->setVisible(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
