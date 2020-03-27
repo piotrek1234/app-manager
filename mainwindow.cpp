@@ -33,7 +33,6 @@ void MainWindow::on_pbStopApp_clicked()
 void MainWindow::on_pbAddApp_clicked()
 {
     AppInfo *info = new AppInfo();
-    connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(refreshList()));
     connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
     infos.append(info);
     QIcon icon = Utils::appStateToIcon(info->state);
@@ -156,7 +155,6 @@ void MainWindow::loadSettings()
         info->path = settings.value(SETTINGS__PATH_PREFIX + num, "").toString();
         info->workingDir = settings.value(SETTINGS__WORK_DIR_PREFIX + num, "").toString();
         info->saveOutput = settings.value(SETTINGS__SAVE_OUTPUT_PREFIX + num, false).toBool();
-        connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(refreshList()));
         connect(info, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
         infos.append(info);
         QIcon icon = Utils::appStateToIcon(info->state);
@@ -327,7 +325,7 @@ void MainWindow::beforeExit()
         msgBox.exec();
         if (msgBox.clickedButton() == closeAll) {
             on_pbStopAll_clicked();
-            qApp->quit();
+            aboutToExit = true;
         } else if (msgBox.clickedButton() == justQuit) {
             qApp->quit();
         } else if (msgBox.clickedButton() == stay) {
@@ -338,10 +336,17 @@ void MainWindow::beforeExit()
     }
 }
 
+void MainWindow::checkExitAfterAllClosed()
+{
+    if (aboutToExit && getRunningAppsCount() == 0) {
+        qApp->quit();
+    }
+}
+
 void MainWindow::on_pbDuplicateApp_clicked()
 {
     AppInfo *newInfo = getCurrentAppInfo()->clone();
-    connect(newInfo, SIGNAL(stateChanged()), this, SLOT(refreshList()));
+    connect(newInfo, SIGNAL(stateChanged(AppInfo*)), this, SLOT(handleAppStateChanged(AppInfo*)));
     infos.append(newInfo);
     QIcon icon = Utils::appStateToIcon(newInfo->state);
     QListWidgetItem *item = new QListWidgetItem(icon, newInfo->printableName());
@@ -379,6 +384,8 @@ int MainWindow::getRunningAppsCount()
 
 void MainWindow::handleAppStateChanged(AppInfo *info)
 {
+    refreshList();
+    checkExitAfterAllClosed();
     if (internalSettings.notifySelfOff && info->state == AppState::SELF_OFF) {
 
         tray->showMessage("AppManager",

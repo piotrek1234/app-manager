@@ -74,6 +74,7 @@ private slots:
     void showMainWindow();
     void closeEvent(QCloseEvent *event);
     void beforeExit();
+    void checkExitAfterAllClosed();
 
 private:
     Ui::MainWindow *ui;
@@ -81,5 +82,6 @@ private:
     int currentAppIndex = 0;
     Settings internalSettings;
     QSystemTrayIcon *tray;
+    bool aboutToExit = false;
 };
 #endif // MAINWINDOW_H
