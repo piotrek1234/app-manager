@@ -12,6 +12,9 @@ const bool DEFAULT_NOTIFY_SELF_OFF = true;
 const QString DATE_TIME_FORMAT = "yyyy-MM-dd_hh-mm-ss";
 const QString LOG_PATH = "/log";
 
+const QString TRAY_FONT_NAME = "Arial";
+const int TRAY_FONT_SIZE = 6;
+
 const QString SETTINGS_FILE = "settings.ini";
 const QString SETTINGS__APPS_COUNT = "count";
 const QString SETTINGS__WINDOW_HEIGHT = "windowHeight";

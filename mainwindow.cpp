@@ -283,7 +283,7 @@ void MainWindow::updateTrayIcon(bool forceUpdate)
         if (internalSettings.showAppsCount && runningApps > 0) {
             QPixmap pixmap(":/tray/apps_bullet");
             QPainter painter(&pixmap);
-            QFont font = QFont("Arial", 6);
+            QFont font = QFont(TRAY_FONT_NAME, TRAY_FONT_SIZE);
             painter.setFont(font);
             painter.drawText(1, 15, QString::number(runningApps));
             tray->setIcon(QIcon(pixmap));
