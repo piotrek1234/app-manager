@@ -3,7 +3,7 @@
 
 #include <QString>
 
-const QString VERSION = "v0.1.1";
+const QString VERSION = "v0.1.2";
 
 const QString DEFAULT_APP_NAME = "app";
 const bool DEFAULT_SHOW_TRAY_APPS_COUNT = true;
@@ -11,6 +11,9 @@ const bool DEFAULT_NOTIFY_SELF_OFF = true;
 
 const QString DATE_TIME_FORMAT = "yyyy-MM-dd_hh-mm-ss";
 const QString LOG_PATH = "/log";
+
+const QString TRAY_FONT_NAME = "Arial";
+const int TRAY_FONT_SIZE = 6;
 
 const QString SETTINGS_FILE = "settings.ini";
 const QString SETTINGS__APPS_COUNT = "count";
