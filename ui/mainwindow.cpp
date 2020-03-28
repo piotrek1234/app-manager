@@ -304,7 +304,12 @@ void MainWindow::openLogsDir()
 
 void MainWindow::showMainWindow()
 {
-    this->setVisible(true);
+    if (this->isVisible()) {
+        this->setWindowState(this->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+        this->activateWindow();
+    } else {
+        this->setVisible(true);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
