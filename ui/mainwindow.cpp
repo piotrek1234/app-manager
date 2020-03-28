@@ -6,8 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     loadSettings();
-    QString logDir = qApp->applicationDirPath() + LOG_PATH;
-    Utils::prepareDirectory(logDir);
+    prepareLogDir();
     configureTrayIcon();
 }
 
@@ -300,6 +299,12 @@ void MainWindow::openLogsDir()
     if (!dir.exists())
         dir.mkpath(".");
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
+}
+
+void MainWindow::prepareLogDir()
+{
+    QString logDir = qApp->applicationDirPath() + LOG_PATH;
+    Utils::prepareDirectory(logDir);
 }
 
 void MainWindow::showMainWindow()

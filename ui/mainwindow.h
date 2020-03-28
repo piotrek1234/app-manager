@@ -71,6 +71,7 @@ private slots:
     void configureTrayIcon();
     void updateTrayIcon(bool forceUpdate=false);
     void openLogsDir();
+    void prepareLogDir();
     void showMainWindow();
     void closeEvent(QCloseEvent *event);
     void beforeExit();
