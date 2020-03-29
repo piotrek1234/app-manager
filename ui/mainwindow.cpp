@@ -158,9 +158,7 @@ void MainWindow::on_pbMoveDown_clicked()
 void MainWindow::on_pbOpenLogDir_clicked()
 {
     QString logDir = qApp->applicationDirPath() + LOG_PATH + "/" + getCurrentAppInfo()->name;
-    QDir dir(logDir);
-    if (!dir.exists())
-        dir.mkpath(".");
+    QDir dir = Utils::prepareDirectory(logDir);
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
@@ -251,9 +249,7 @@ void MainWindow::updateTrayIcon(bool forceUpdate)
 void MainWindow::openLogsDir()
 {
     QString logDir = qApp->applicationDirPath() + LOG_PATH;
-    QDir dir(logDir);
-    if (!dir.exists())
-        dir.mkpath(".");
+    Utils::prepareDirectory(logDir);
     QDesktopServices::openUrl(QUrl::fromLocalFile(logDir));
 }
 
