@@ -73,7 +73,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/folder_browse</normaloff>:/icon/folder_browse</iconset>
         </property>
        </widget>
@@ -101,7 +101,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/folder_browse</normaloff>:/icon/folder_browse</iconset>
         </property>
        </widget>
@@ -131,7 +131,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/play</normaloff>:/icon/play</iconset>
         </property>
        </widget>
@@ -148,7 +148,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/pause</normaloff>:/icon/pause</iconset>
         </property>
        </widget>
@@ -165,7 +165,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/folder</normaloff>:/icon/folder</iconset>
         </property>
        </widget>
@@ -182,7 +182,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/logs</normaloff>:/icon/logs</iconset>
         </property>
        </widget>
@@ -199,7 +199,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/app</normaloff>:/icon/app</iconset>
         </property>
        </widget>
@@ -216,7 +216,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/save</normaloff>:/icon/save</iconset>
         </property>
        </widget>
@@ -230,7 +230,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="res.qrc">
+         <iconset resource="../res.qrc">
           <normaloff>:/icon/stop</normaloff>:/icon/stop</iconset>
         </property>
        </widget>
@@ -261,7 +261,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/add</normaloff>:/icon/add</iconset>
             </property>
            </widget>
@@ -278,7 +278,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/delete</normaloff>:/icon/delete</iconset>
             </property>
            </widget>
@@ -295,7 +295,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/up</normaloff>:/icon/up</iconset>
             </property>
            </widget>
@@ -312,7 +312,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/down</normaloff>:/icon/down</iconset>
             </property>
            </widget>
@@ -342,7 +342,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/wrench</normaloff>:/icon/wrench</iconset>
             </property>
            </widget>
@@ -359,7 +359,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="res.qrc">
+             <iconset resource="../res.qrc">
               <normaloff>:/icon/duplicate</normaloff>:/icon/duplicate</iconset>
             </property>
            </widget>
@@ -382,7 +382,53 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="lwApps"/>
+       <widget class="QTreeWidget" name="twApps">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::CurrentChanged</set>
+        </property>
+        <property name="showDropIndicator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="indentation">
+         <number>0</number>
+        </property>
+        <property name="rootIsDecorated">
+         <bool>true</bool>
+        </property>
+        <property name="headerHidden">
+         <bool>true</bool>
+        </property>
+        <property name="expandsOnDoubleClick">
+         <bool>false</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>20</number>
+        </attribute>
+        <attribute name="headerDefaultSectionSize">
+         <number>83</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>state</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>info</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>branch</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </item>
@@ -390,7 +436,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections/>
 </ui>
