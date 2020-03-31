@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     appinfo.cpp \
+    appoutputhandler.cpp \
     main.cpp \
     settings.cpp \
     ui/mainwindow.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 HEADERS += \
     appinfo.h \
+    appoutputhandler.h \
     appstate.h \
     consts.h \
     settings.h \

@@ -9,6 +9,7 @@ AppInfo::AppInfo(QObject *parent) : QObject(parent)
 
 AppInfo::~AppInfo()
 {
+    //delete handler;
     delete process;
 }
 
@@ -39,6 +40,11 @@ void AppInfo::stopped(int code)
     exitCode = code;
     manualOff = false;
     emit stateChanged(this);
+}
+
+void AppInfo::handleOutput()
+{
+    emit hasOutput(process->readAll());
 }
 
 void AppInfo::startProcess()

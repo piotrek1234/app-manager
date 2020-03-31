@@ -16,6 +16,7 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 #include "appinfo.h"
+#include "appoutputhandler.h"
 #include "consts.h"
 #include "settings.h"
 #include "settingsdialog.h"

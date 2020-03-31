@@ -11,6 +11,8 @@
 #include "consts.h"
 #include "utils.h"
 
+class AppOutputHandler;
+
 class AppInfo : public QObject
 {
 Q_OBJECT
@@ -26,18 +28,21 @@ public:
     QString workingDir;
     bool saveOutput = false;
     AppState state = AppState::INITIAL_OFF;
+    AppOutputHandler *handler;
 public slots:
     void startProcess();
     void stopProcess();
 private slots:
     void started();
     void stopped(int code);
+    void handleOutput();
 private:
     QProcess *process;
     int exitCode = -1;
     bool manualOff = false;
 signals:
     void stateChanged(AppInfo* info);
+    void hasOutput(QString output);
 };
 
 #endif // APPINFO_H

@@ -38,6 +38,7 @@ void MainWindow::on_pbAddApp_clicked()
     infos.append(info);
     QIcon icon = Utils::appStateToIcon(info->state);
     QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+    info->handler = (new AppOutputHandler(info))->setAppInfo(info)->setTrayIcon(tray)->setWidgetItem(item);
     item->setIcon(0, icon);
     item->setText(1, info->printableName());
     saveSettings();
@@ -50,6 +51,7 @@ void MainWindow::refreshList()
     for (AppInfo *info : infos) {
         QIcon icon = Utils::appStateToIcon(info->state);
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+        info->handler->setWidgetItem(item);
         item->setIcon(0, icon);
         item->setText(1, info->printableName());
     }
@@ -113,6 +115,7 @@ void MainWindow::loadSettings()
         infos.append(info);
         QIcon icon = Utils::appStateToIcon(info->state);
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+        info->handler = (new AppOutputHandler(info))->setAppInfo(info)->setTrayIcon(tray)->setWidgetItem(item);
         item->setIcon(0, icon);
         item->setText(1, info->printableName());
     }
@@ -312,6 +315,7 @@ void MainWindow::on_pbDuplicateApp_clicked()
     infos.append(newInfo);
     QIcon icon = Utils::appStateToIcon(newInfo->state);
     QTreeWidgetItem *item = new QTreeWidgetItem(ui->twApps);
+    newInfo->handler = (new AppOutputHandler(newInfo))->setAppInfo(newInfo)->setTrayIcon(tray)->setWidgetItem(item);
     item->setIcon(0, icon);
     item->setText(1, newInfo->printableName());
     saveSettings();
